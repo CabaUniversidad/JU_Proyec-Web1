@@ -27,20 +27,14 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: 📦 Construir y Publicar Backend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./Backend
-          push: true
-          tags: ${{ secrets.DOCKER_USER}}/backend_fastapi:latest
-          platforms: linux/amd64
+       
 
       - name: 📦 Construir y Publicar Frontend
         uses: docker/build-push-action@v5
         with:
           context: ./Frontend
           push: true
-          tags: ${{ secrets.DOCKER_USER}}/front_web:latest
+          tags: ${{ secrets.DOCKER_USER}}/front_next:latest
           platforms: linux/amd64
 
     outputs:
