@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # -------------------- FRONTEND (Next.js) --------------------
+  frontend:
+    # 🎯 CAMBIO CRÍTICO 1: Usar la variable de Shell para la imagen del frontend
+    image: facc1/front_next:latest # ⬅️ Imagen de Docker del nuevo frontend Next.js
+    container_name: frontend
+    restart: always
+    # 🎯 CAMBIO CRÍTICO 2: Mapear el puerto público 80 al puerto interno **3000**
+    # (Puerto por defecto de Next.js en el contenedor).
+    ports:
+      - "80:3000" # ⬅️ Mapear el puerto 80 (público) al 3000 (interno de Next.js)
+    depends_on:
+      - backend
+
+  # -------------------- BACKEND (FastAPI) --------------------
+  backend:
+    # 🎯 No se requiere cambio aquí si el backend sigue siendo FastAPI.
+    image: facc1/backend_fastapi:latest
+    container_name: backend
+    restart: always
+    environment:
+      # 🎯 CONEXIÓN FRONTEND-BACKEND: Usar el nombre del servicio 'backend' para la comunicación interna.
+      # Para el backend, la URL del frontend es la IP pública, si la necesita.
+      - FRONTEND_URL=http://<IP_PUBLICA_VM> 
+    ports:
+      - "8000:8000"
+      
+networks:
+  default:
+    # Usa la red por defecto creada por Docker Compose para que los servicios se vean entre sí.
