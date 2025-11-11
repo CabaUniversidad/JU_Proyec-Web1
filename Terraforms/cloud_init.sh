@@ -16,7 +16,7 @@ sudo ufw allow 22/tcp
 sudo ufw allow 80/tcp  # ⬅️ Puerto público para acceso web
 sudo ufw allow 443/tcp
 sudo ufw allow 3000/tcp # ⬅️ ¡CRÍTICO! Puerto interno de Next.js (aunque mapeado al 80)
-sudo ufw allow 8000/tcp # ⬅️ Puerto del Backend
+sudo ufw allow 8000/tcp
 sudo ufw --force enable
 
 echo "Configuración inicial de la VM completada (sin Docker)."

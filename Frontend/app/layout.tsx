@@ -7,7 +7,7 @@ import { ChatbotWidget } from "@/components/chatbot/chatbot-widget"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "OfficeSupply - Sistema de Distribución de Material de Escritorio",
+  title: "OfficeSupply - Sistema de Distribución de Material de Escritorio   UNIVALLE",
   description: "Sistema integral para la distribución eficiente de material de escritorio y oficina para empresas.",
   generator: "v0.dev",
 }
