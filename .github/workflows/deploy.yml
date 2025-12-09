@@ -3,7 +3,7 @@ name: Despliegue Completo OCI con Terraform
 on:
   push:
     branches:
-      - dev
+      - main
 
 env:
   VM_SSH_USER: ubuntu

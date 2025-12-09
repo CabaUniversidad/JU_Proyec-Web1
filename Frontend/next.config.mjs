@@ -13,7 +13,7 @@ const nextConfig = {
   },
   // CRÍTICO: ELIMINAR O COMENTAR la línea 'output: "standalone"',
   // ya que no estás utilizando esa estructura de despliegue.
-  // output: "standalone", 
+  output: "standalone", 
 }
 
 export default nextConfig
