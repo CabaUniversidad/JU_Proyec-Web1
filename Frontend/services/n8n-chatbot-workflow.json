@@ -1,0 +1,93 @@
+{
+  "name": "OfficeSupply Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://nslovcpniaogjsxxzycu.supabase.co/rest/v1/producto?select=*&estado=eq.true&limit=5",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "httpMethod": "GET",
+        "options": {
+          "headers": {
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbG92Y3BuaWFvZ2pzeHh6eWN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk2NjA4MjMsImV4cCI6MjA0NTIzNjgyM30.Bwf4kOhyFOWb6D_fTSpQ7M_-WuvsDHor9umrMsI5ivU",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbG92Y3BuaWFvZ2pzeHh6eWN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk2NjA4MjMsImV4cCI6MjA0NTIzNjgyM30.Bwf4kOhyFOWb6D_fTSpQ7M_-WuvsDHor9umrMsI5ivU"
+          }
+        }
+      },
+      "id": "get-products",
+      "name": "Get Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Procesar mensaje del usuario\nconst userMessage = $input.first().json.message.toLowerCase();\nconst products = $input.all()[1]?.json || [];\n\nlet response = {\n  success: true,\n  message: \"\",\n  suggestions: [],\n  products: null,\n  nextAction: null\n};\n\nif (userMessage.includes(\"producto\") || userMessage.includes(\"productos\") || userMessage.includes(\"catálogo\")) {\n  if (products.length > 0) {\n    response.message = `Encontré ${products.length} productos disponibles. Aquí tienes algunos:`;\n    response.products = products;\n    response.suggestions = [\"Ver más productos\", \"Filtrar por categoría\", \"Consultar precios\", \"Hacer un pedido\"];\n  } else {\n    response.message = \"Lo siento, no encontré productos disponibles en este momento.\";\n    response.suggestions = [\"Contactar soporte\", \"Ver catálogo completo\"];\n  }\n} else if (userMessage.includes(\"precio\") || userMessage.includes(\"precios\")) {\n  response.message = \"¿Sobre qué producto te gustaría conocer el precio? Puedes decirme el nombre o categoría.\";\n  response.suggestions = [\"Bolígrafos\", \"Cuadernos\", \"Archivadores\", \"Ver todos los precios\"];\n} else if (userMessage.includes(\"pedido\") || userMessage.includes(\"comprar\")) {\n  response.message = \"¡Perfecto! Te ayudo a hacer tu pedido. ¿Qué productos necesitas?\";\n  response.suggestions = [\"Ver productos disponibles\", \"Buscar producto específico\", \"Ver mi carrito\", \"Hablar con ventas\"];\n} else if (userMessage.includes(\"estado\") || userMessage.includes(\"solicitud\")) {\n  response.message = \"Para consultar el estado de tu solicitud, necesito algunos datos. ¿Podrías proporcionarme tu email o número de solicitud?\";\n  response.suggestions = [\"Proporcionar email\", \"Proporcionar número de solicitud\", \"Contactar soporte\"];\n} else if (userMessage.includes(\"humano\") || userMessage.includes(\"soporte\")) {\n  response.message = \"Te conectaré con nuestro equipo de soporte. Mientras tanto, ¿podrías contarme brevemente en qué necesitas ayuda?\";\n  response.suggestions = [\"Problema con pedido\", \"Consulta técnica\", \"Información de productos\", \"Facturación\"];\n} else if (userMessage.includes(\"hola\") || userMessage.includes(\"buenos\") || userMessage.includes(\"buenas\")) {\n  response.message = \"¡Hola! Bienvenido a OfficeSupply. Soy tu asistente virtual y estoy aquí para ayudarte. ¿En qué puedo asistirte hoy?\";\n  response.suggestions = [\"Ver productos disponibles\", \"Consultar precios\", \"Hacer un pedido\", \"Estado de mi solicitud\", \"Hablar con un humano\"];\n} else {\n  response.message = \"Entiendo que necesitas ayuda, pero no estoy seguro de cómo asistirte con eso. ¿Podrías ser más específico o elegir una de estas opciones?\";\n  response.suggestions = [\"Ver productos disponibles\", \"Consultar precios\", \"Hacer un pedido\", \"Hablar con soporte\"];\n}\n\nreturn response;"
+      },
+      "id": "process-message",
+      "name": "Process Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "response",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Products": {
+      "main": [
+        [
+          {
+            "node": "Process Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Message": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

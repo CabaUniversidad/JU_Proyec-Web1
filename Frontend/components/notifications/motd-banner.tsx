@@ -50,7 +50,7 @@ export function MOTDBanner({
       <Sparkles className="h-4 w-4 text-green-600" />
       <AlertDescription className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-medium">MOTD:</span>
+          <span className="font-medium">Mensaje:</span>
           <span>{message}</span>
         </div>
 

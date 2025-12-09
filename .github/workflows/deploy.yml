@@ -27,8 +27,6 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-       
-
       - name: 📦 Construir y Publicar Frontend
         uses: docker/build-push-action@v5
         with:
@@ -42,6 +40,7 @@ jobs:
 
   # Job 2: Aprovisionamiento de Infraestructura con Terraform en OCI
   terraform-provision:
+    if: false
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -96,6 +95,7 @@ jobs:
 
   # Job 3: Despliegue de la Solución en la VM
   deploy-to-vm:
+    if: false
     needs: terraform-provision
     runs-on: ubuntu-latest
     env:
@@ -188,12 +188,10 @@ jobs:
       final_ip: ${{ needs.terraform-provision.outputs.public_ip }}
 
   # Job 4: Notificación por Correo (Fallo o Éxito)
-  # ... (rest of the job)
-
-  # Job 4: Notificación por Correo (Fallo o Éxito)
   notify-result:
+    if: false
     needs: [deploy-to-vm]
-    if: always()
+    #if: always()
     runs-on: ubuntu-latest
 
     steps:

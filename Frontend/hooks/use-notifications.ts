@@ -9,9 +9,7 @@ export function useNotifications() {
   const [banners, setBanners] = useState<Banner[]>([])
   const [newProductAlerts, setNewProductAlerts] = useState<ProductAlert[]>([])
   const [loading, setLoading] = useState(true)
-  const [lastProductCheck, setLastProductCheck] = useState<Date>(new Date())
 
-  // Función para obtener mensaje legible de error
   function getErrorMessage(error: unknown): string {
     if (!error) return "Error desconocido"
     if (typeof error === "string") return error
@@ -23,7 +21,6 @@ export function useNotifications() {
     }
   }
 
-  // Cargar notificaciones activas
   const fetchNotifications = useCallback(async () => {
     try {
       const stored = localStorage.getItem("officesupply_notifications")
@@ -36,7 +33,7 @@ export function useNotifications() {
             endDate: n.endDate ? new Date(n.endDate) : undefined,
             createdAt: new Date(n.createdAt),
             updatedAt: new Date(n.updatedAt),
-          })),
+          }))
         )
       }
     } catch (error) {
@@ -44,49 +41,47 @@ export function useNotifications() {
     }
   }, [])
 
-  // Verificar nuevos productos
+  // ✅ Mostrar últimos 4 productos agregados según created_at
   const checkForNewProducts = useCallback(async () => {
     try {
       const { data: products, error } = await supabase
         .from("producto")
         .select(`
-        idprod,
-        nomproducto,
-        imagen,
-        preciounitario,
-        categoria:categoria(nomcategoria)
-      `)
+          idprod,
+          nomproducto,
+          imagen,
+          preciounitario,
+          created_at,
+          categoria:categoria(nomcategoria)
+        `)
         .eq("estado", true)
-        .order("idprod", { ascending: false })
-        .limit(5)
+        .order("created_at", { ascending: false })
+        .limit(3)
 
       if (error) throw error
 
-      const now = new Date()
+      const formatted: ProductAlert[] = (products || []).map((product) => ({
+        productId: product.idprod,
+        productName: product.nomproducto || "",
+        productImage: product.imagen,
+        addedAt: new Date(product.created_at),
+        category: product.categoria?.[0]?.nomcategoria ?? "Sin categoría",
+        price: product.preciounitario,
+      }))
 
-      const newProducts =
-        products?.slice(0, 2).map((product) => ({
-          productId: product.idprod,
-          productName: product.nomproducto || "",
-          productImage: product.imagen,
-          addedAt: now,
-          category: product.categoria?.[0]?.nomcategoria ?? "Sin categoría",
-          price: product.preciounitario,
-        })) || []
+      const isChanged = JSON.stringify(formatted.map(p => p.productId)) !==
+                        JSON.stringify(newProductAlerts.map(p => p.productId))
 
-      if (newProducts.length > 0) {
-        setNewProductAlerts(newProducts)
-        createNewProductBanner(newProducts)
+      if (isChanged && formatted.length > 0) {
+        setNewProductAlerts(formatted)
+        createNewProductBanner(formatted)
       }
 
-      setLastProductCheck(now)
     } catch (error) {
       console.error("Error checking for new products:", getErrorMessage(error))
     }
-  }, [])
+  }, [newProductAlerts])
 
-
-  // Crear banner para nuevos productos
   const createNewProductBanner = (products: ProductAlert[]) => {
     const banner: Banner = {
       id: `new_products_${Date.now()}`,
@@ -94,12 +89,14 @@ export function useNotifications() {
       content:
         products.length === 1
           ? `🎉 ¡Nuevo producto disponible! ${products[0].productName}`
-          : `🎉 ¡${products.length} nuevos productos disponibles!`,
+          : `🎉 ¡${products.length} nuevos productos disponibles!: ${products
+              .map((p) => p.productName)
+              .join(", ")}`,
       variant: "success",
       isVisible: true,
       isDismissible: true,
       autoHide: true,
-      hideAfter: 10000, // 10 segundos
+      hideAfter: 10000,
       link: "/catalogo",
       linkText: "Ver productos",
       createdAt: new Date(),
@@ -108,7 +105,6 @@ export function useNotifications() {
     setBanners((prev) => [banner, ...prev])
   }
 
-  // Crear notificación personalizada
   const createNotification = useCallback(
     (notification: Omit<Notification, "id" | "createdAt" | "updatedAt">) => {
       const newNotification: Notification = {
@@ -126,10 +122,9 @@ export function useNotifications() {
 
       return newNotification
     },
-    [],
+    []
   )
 
-  // Crear banner personalizado
   const createBanner = useCallback((banner: Omit<Banner, "id" | "createdAt">) => {
     const newBanner: Banner = {
       ...banner,
@@ -141,23 +136,20 @@ export function useNotifications() {
     return newBanner
   }, [])
 
-  // Dismissar banner
   const dismissBanner = useCallback((bannerId: string) => {
     setBanners((prev) => prev.filter((banner) => banner.id !== bannerId))
   }, [])
 
-  // Marcar notificación como leída
   const markAsRead = useCallback((notificationId: string) => {
     setNotifications((prev) => {
       const updated = prev.map((notif) =>
-        notif.id === notificationId ? { ...notif, updatedAt: new Date() } : notif,
+        notif.id === notificationId ? { ...notif, updatedAt: new Date() } : notif
       )
       localStorage.setItem("officesupply_notifications", JSON.stringify(updated))
       return updated
     })
   }, [])
 
-  // Auto-hide banners
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
 
@@ -175,7 +167,6 @@ export function useNotifications() {
     }
   }, [banners, dismissBanner])
 
-  // Verificar nuevos productos periódicamente
   useEffect(() => {
     const interval = setInterval(() => {
       checkForNewProducts()
@@ -184,7 +175,6 @@ export function useNotifications() {
     return () => clearInterval(interval)
   }, [checkForNewProducts])
 
-  // Cargar datos iniciales
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)

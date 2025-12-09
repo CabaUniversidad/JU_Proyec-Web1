@@ -1,38 +1,38 @@
+// types/chatbot.ts
+
 export interface ChatMessage {
   id: string
   content: string
-  sender: "user" | "bot"
+  sender: "bot" | "user"
   timestamp: Date
-  type?: "text" | "product" | "order" | "options"
-  data?: any
+  type: "text" | "options" | "product"
+  data?: {
+    options?: string[]
+    products?: Product[]
+    nextAction?: string
+  }
+}
+
+export interface Product {
+  NomProducto: string
+  marca: string
+  PrecioUnitario: number
+  Stock: number
+  descripcion?: string
+  imagen?: string
 }
 
 export interface ChatbotState {
   isOpen: boolean
   messages: ChatMessage[]
   isTyping: boolean
-  currentFlow?: string
-}
-
-export interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  image?: string
 }
 
 export interface N8NWebhookResponse {
-  success: boolean
+  success?: boolean
   message: string
-  data?: any
   suggestions?: string[]
-  products?: Product[]
   nextAction?: string
-}
-
-export interface ChatbotIntent {
-  intent: string
-  confidence: number
-  entities?: Record<string, any>
+  products?: any[]
+  context?: any  
 }
