@@ -40,7 +40,7 @@ jobs:
 
   # Job 2: Aprovisionamiento de Infraestructura con Terraform en OCI
   terraform-provision:
-    if: false
+    if: true
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -95,7 +95,7 @@ jobs:
 
   # Job 3: Despliegue de la Solución en la VM
   deploy-to-vm:
-    if: false
+    if: true
     needs: terraform-provision
     runs-on: ubuntu-latest
     env:
@@ -189,7 +189,7 @@ jobs:
 
   # Job 4: Notificación por Correo (Fallo o Éxito)
   notify-result:
-    if: false
+    if: true
     needs: [deploy-to-vm]
     #if: always()
     runs-on: ubuntu-latest
