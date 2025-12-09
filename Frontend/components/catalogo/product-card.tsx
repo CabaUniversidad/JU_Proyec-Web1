@@ -39,7 +39,7 @@ export function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart
           ) : (
             <div className="text-center text-white">
               <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <span className="text-sm opacity-75">Sin imagen</span>
+              <span className="text-sm opacity-75">Vista no Disponible</span>
             </div>
           )}
         </div>
@@ -56,11 +56,11 @@ export function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart
         <Badge className={`absolute top-3 left-3 ${badge.className}`}>{badge.text}</Badge>
 
         {product.Stock !== undefined && product.Stock <= 5 && product.Stock > 0 && (
-          <Badge className="absolute bottom-3 left-3 bg-orange-600 text-white">Stock bajo: {product.Stock}</Badge>
+          <Badge className="absolute bottom-3 left-3 bg-orange-600 text-white">Productos Disponibles: {product.Stock}</Badge>
         )}
 
         {product.Stock === 0 && (
-          <Badge className="absolute bottom-3 left-3 bg-red-600 text-white">Sin stock</Badge>
+          <Badge className="absolute bottom-3 left-3 bg-red-600 text-white">Producto Agotado</Badge>
         )}
       </div>
 

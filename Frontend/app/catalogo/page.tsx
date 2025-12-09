@@ -14,6 +14,7 @@ import { ProductModal } from "@/components/catalogo/product-modal"
 import { BannerSystem } from "@/components/notifications/banner-system"
 import { ProductAlertCard } from "@/components/notifications/product-alert-card"
 import type { Product } from "@/types/product"
+import { Footer } from "@/components/shared/footer"
 
 // Función para obtener mensaje seguro del error
 function getErrorMessage(error: unknown): string {
@@ -112,9 +113,7 @@ export default function CatalogoPage() {
   }
 
   // Marcas únicas filtrando nulls
-  const uniqueBrands = [
-    ...new Set(products.map((p) => p.marca).filter((b): b is string => !!b))
-  ]
+  const uniqueBrands = [...new Set(products.map((p) => p.marca).filter((b): b is string => !!b))]
 
   const maxPrice = Math.max(...products.map((p) => p.PrecioUnitario ?? 0), 10000)
 
@@ -123,7 +122,7 @@ export default function CatalogoPage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando productos </p>
+          <p className="text-gray-600">Cargando productos...</p>
         </div>
       </div>
     )
@@ -133,9 +132,7 @@ export default function CatalogoPage() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <p className="text-red-600 mb-4 font-semibold">
-            Error: {getErrorMessage(error)}
-          </p>
+          <p className="text-red-600 mb-4 font-semibold">Error: {getErrorMessage(error)}</p>
           <pre className="text-xs text-gray-700 bg-gray-100 p-2 rounded overflow-x-auto">
             {JSON.stringify(error, null, 2)}
           </pre>
@@ -241,11 +238,13 @@ export default function CatalogoPage() {
         product={selectedProduct}
         onToggleFavorite={toggleFavorite}
         onAddToCart={(productId, quantity) => {
-          const product = products.find(p => p.idProd === productId)
+          const product = products.find((p) => p.idProd === productId)
           if (product) addToCart(product, quantity)
         }}
         isFavorite={selectedProduct ? favoriteProducts.some((p) => p.idProd === selectedProduct.idProd) : false}
       />
+
+      <Footer />
     </div>
   )
 }
